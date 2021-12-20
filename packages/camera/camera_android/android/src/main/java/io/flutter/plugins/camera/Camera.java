@@ -191,6 +191,7 @@ class Camera
       cameraDevice.close();
     }
   }
+  private OnImageAvailableHandler imageAvailableHandler;
 
   public Camera(
       final Activity activity,
@@ -556,6 +557,83 @@ class Camera
       return;
     }
 
+    imageAvailableHandler = reader -> new ImageSaver(
+            // Use acquireNextImage since image reader is only for one image.
+            reader.acquireNextImage(),
+            captureFile,
+            new ImageSaver.Callback() {
+              @Override
+              public void onComplete(String absolutePath) {
+                dartMessenger.finish(flutterResult, absolutePath);
+              }
+
+              @Override
+              public void onError(String errorCode, String errorMessage) {
+                dartMessenger.error(flutterResult, errorCode, errorMessage, null);
+              }
+            });
+
+    // Listen for picture being taken.
+    pictureImageReader.setOnImageAvailableListener(this, backgroundHandler);
+
+    final AutoFocusFeature autoFocusFeature = cameraFeatures.getAutoFocus();
+    final boolean isAutoFocusSupported = autoFocusFeature.checkIsSupported();
+    if (isAutoFocusSupported && autoFocusFeature.getValue() == FocusMode.auto) {
+      runPictureAutoFocus();
+    } else {
+      runPrecaptureSequence();
+    }
+  }
+
+  public void takePictureAsBytes(@NonNull final Result result) {
+    // Only take one picture at a time.
+    if (cameraCaptureCallback.getCameraState() != CameraState.STATE_PREVIEW) {
+      result.error("captureAlreadyActive", "Picture is currently already being captured", null);
+      return;
+    }
+
+    flutterResult = result;
+
+    try {
+      captureTimeouts.reset();
+    } catch (Exception e) {
+      dartMessenger.error(flutterResult, "cannotTakePicture", e.getMessage(), null);
+      return;
+    }
+
+    imageAvailableHandler = reader -> new Runnable(){
+        public void run(){
+          Image img = reader.acquireNextImage();
+          List<Map<String, Object>> planes = new ArrayList<>();
+          for (Image.Plane plane : img.getPlanes()) {
+            ByteBuffer buffer = plane.getBuffer();
+
+            byte[] bytes = new byte[buffer.remaining()];
+            buffer.get(bytes, 0, bytes.length);
+
+            Map<String, Object> planeBuffer = new HashMap<>();
+            planeBuffer.put("bytesPerRow", plane.getRowStride());
+            planeBuffer.put("bytesPerPixel", plane.getPixelStride());
+            planeBuffer.put("bytes", bytes);
+
+            planes.add(planeBuffer);
+          }
+
+          Map<String, Object> imageBuffer = new HashMap<>();
+          imageBuffer.put("width", img.getWidth());
+          imageBuffer.put("height", img.getHeight());
+          imageBuffer.put("format", img.getFormat());
+          imageBuffer.put("planes", planes);
+          imageBuffer.put("lensAperture", captureProps.getLastLensAperture());
+          imageBuffer.put("sensorExposureTime", captureProps.getLastSensorExposureTime());
+          Integer sensorSensitivity = captureProps.getLastSensorSensitivity();
+          imageBuffer.put(
+                  "sensorSensitivity", sensorSensitivity == null ? null : (double) sensorSensitivity);
+            dartMessenger.finish(flutterResult, imageBuffer);
+          img.close();
+        }
+    };
+
     // Listen for picture being taken.
     pictureImageReader.setOnImageAvailableListener(this, backgroundHandler);
 
@@ -617,7 +695,7 @@ class Camera
     // This is the CaptureRequest.Builder that is used to take a picture.
     CaptureRequest.Builder stillBuilder;
     try {
-      stillBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+      stillBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_ZERO_SHUTTER_LAG);
     } catch (CameraAccessException e) {
       dartMessenger.error(flutterResult, "cameraAccess", e.getMessage(), null);
       return;
@@ -1091,21 +1169,7 @@ class Camera
     Log.i(TAG, "onImageAvailable");
 
     backgroundHandler.post(
-        new ImageSaver(
-            // Use acquireNextImage since image reader is only for one image.
-            reader.acquireNextImage(),
-            captureFile,
-            new ImageSaver.Callback() {
-              @Override
-              public void onComplete(String absolutePath) {
-                dartMessenger.finish(flutterResult, absolutePath);
-              }
-
-              @Override
-              public void onError(String errorCode, String errorMessage) {
-                dartMessenger.error(flutterResult, errorCode, errorMessage, null);
-              }
-            }));
+            imageAvailableHandler.onImageAvailable(reader));
     cameraCaptureCallback.setCameraState(CameraState.STATE_PREVIEW);
   }
 
@@ -1266,5 +1330,10 @@ class Camera
     public static Handler create(Looper looper) {
       return new Handler(looper);
     }
+  }
+
+
+  public interface OnImageAvailableHandler {
+    Runnable onImageAvailable(ImageReader reader);
   }
 }

@@ -4,6 +4,7 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
@@ -521,7 +522,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
           onPressed: cameraController != null &&
                   cameraController.value.isInitialized &&
                   !cameraController.value.isRecordingVideo
-              ? onTakePictureButtonPressed
+              ? onTakePictureButtonPressed2
               : null,
         ),
         IconButton(
@@ -728,6 +729,22 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
         if (file != null) {
           showInSnackBar('Picture saved to ${file.path}');
         }
+      }
+    });
+  }
+
+  void onTakePictureButtonPressed2() {
+    takePictureAsBytes().then((CameraImage? img) {
+      if (mounted && img != null) {
+        showDialog(
+            context: context,
+            builder: (context) => SimpleDialog(children: [
+                  Image.memory(
+                    Uint8List.fromList(img.planes[0].bytes),
+                    height: 360,
+                    width: 640,
+                  )
+                ]));
       }
     });
   }
@@ -1038,6 +1055,27 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
 
     try {
       final XFile file = await cameraController.takePicture();
+      return file;
+    } on CameraException catch (e) {
+      _showCameraException(e);
+      return null;
+    }
+  }
+
+  Future<CameraImage?> takePictureAsBytes() async {
+    final CameraController? cameraController = controller;
+    if (cameraController == null || !cameraController.value.isInitialized) {
+      showInSnackBar('Error: select a camera first.');
+      return null;
+    }
+
+    if (cameraController.value.isTakingPicture) {
+      // A capture is already pending, do nothing.
+      return null;
+    }
+
+    try {
+      CameraImage file = await cameraController.takePictureAsBytes();
       return file;
     } on CameraException catch (e) {
       _showCameraException(e);

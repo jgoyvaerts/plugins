@@ -395,6 +395,29 @@ class CameraController extends ValueNotifier<CameraValue> {
     }
   }
 
+  /// Captures an image and returns the file where it was saved.
+  ///
+  /// Throws a [CameraException] if the capture fails.
+  Future<CameraImage> takePictureAsBytes() async {
+    _throwIfNotInitialized("takePictureAsBytes");
+    if (value.isTakingPicture) {
+      throw CameraException(
+        'Previous capture has not returned yet.',
+        'takePictureAsBytes was called before the previous capture returned.',
+      );
+    }
+    try {
+      value = value.copyWith(isTakingPicture: true);
+      CameraImage image =
+          await CameraPlatform.instance.takePictureAsBytes(_cameraId);
+      value = value.copyWith(isTakingPicture: false);
+      return image;
+    } on PlatformException catch (e) {
+      value = value.copyWith(isTakingPicture: false);
+      throw CameraException(e.code, e.message);
+    }
+  }
+
   /// Start streaming images from platform camera.
   ///
   /// Settings for capturing images on iOS and Android is set to always use the

@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:camera/camera.dart';
+import 'package:camera_platform_interface/src/types/camera_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -116,6 +117,10 @@ class FakeController extends ValueNotifier<CameraValue>
 
   @override
   Future<void> resumePreview() async {}
+
+  @override
+  Future<CameraImage> takePictureAsBytes() async =>
+      CameraImage.fromPlatformData({});
 }
 
 void main() {

@@ -5,9 +5,16 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:camera_platform_interface/camera_platform_interface.dart';
+import 'package:camera_platform_interface/src/events/device_event.dart';
+import 'package:camera_platform_interface/src/method_channel/method_channel_camera.dart';
+import 'package:camera_platform_interface/src/types/camera_image.dart';
+import 'package:camera_platform_interface/src/types/exposure_mode.dart';
+import 'package:camera_platform_interface/src/types/focus_mode.dart';
+import 'package:camera_platform_interface/src/types/image_format_group.dart';
+import 'package:cross_file/cross_file.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import '../../camera_platform_interface.dart';
 import '../method_channel/method_channel_camera.dart';
@@ -117,6 +124,11 @@ abstract class CameraPlatform extends PlatformInterface {
   /// Captures an image and returns the file where it was saved.
   Future<XFile> takePicture(int cameraId) {
     throw UnimplementedError('takePicture() is not implemented.');
+  }
+
+  /// Captures an image and returns the file where it was saved.
+  Future<CameraImage> takePictureAsBytes(int cameraId) {
+    throw UnimplementedError('takePictureAsBytes() is not implemented.');
   }
 
   /// Prepare the capture session for video recording.
