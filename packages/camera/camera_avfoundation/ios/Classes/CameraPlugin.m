@@ -193,6 +193,12 @@
       } else {
         [result sendNotImplemented];
       }
+    } else if ([@"takePictureAsBytes" isEqualToString:call.method]) {
+        if (@available(iOS 10.0, *)) {
+          [_camera captureStill:result];
+        } else {
+          [result sendNotImplemented];
+        }
     } else if ([@"dispose" isEqualToString:call.method]) {
       [_registry unregisterTexture:cameraId];
       [_camera close];
