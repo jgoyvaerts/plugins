@@ -37,7 +37,8 @@ void main() {
           const CameraDescription(
               name: 'Test',
               lensDirection: CameraLensDirection.back,
-              sensorOrientation: 0),
+              sensorOrientation: 0,
+              supportedOutputFormats: []),
           ResolutionPreset.high,
         );
 
@@ -76,6 +77,7 @@ void main() {
               name: 'Test',
               lensDirection: CameraLensDirection.back,
               sensorOrientation: 0,
+              supportedOutputFormats: [],
             ),
             ResolutionPreset.high,
           ),
@@ -110,6 +112,7 @@ void main() {
               name: 'Test',
               lensDirection: CameraLensDirection.back,
               sensorOrientation: 0,
+              supportedOutputFormats: [],
             ),
             ResolutionPreset.high,
           ),
@@ -172,6 +175,7 @@ void main() {
             name: 'Test',
             lensDirection: CameraLensDirection.back,
             sensorOrientation: 0,
+            supportedOutputFormats: [],
           ),
           ResolutionPreset.high,
         );
@@ -219,6 +223,7 @@ void main() {
             name: 'Test',
             lensDirection: CameraLensDirection.back,
             sensorOrientation: 0,
+            supportedOutputFormats: [],
           ),
           ResolutionPreset.high,
         );
@@ -267,6 +272,7 @@ void main() {
             name: 'Test',
             lensDirection: CameraLensDirection.back,
             sensorOrientation: 0,
+            supportedOutputFormats: [],
           ),
           ResolutionPreset.high,
         );
@@ -437,6 +443,7 @@ void main() {
             name: 'Test',
             lensDirection: CameraLensDirection.back,
             sensorOrientation: 0,
+            supportedOutputFormats: [],
           ),
           ResolutionPreset.high,
         );
@@ -489,6 +496,7 @@ void main() {
             lensDirection: parseCameraLensDirection(
                 returnData[i]['lensFacing']! as String),
             sensorOrientation: returnData[i]['sensorOrientation']! as int,
+            supportedOutputFormats: const <OutputFormat>[],
           );
           expect(cameras[i], cameraDescription);
         }

@@ -32,7 +32,11 @@ class FakeController extends ValueNotifier<CameraValue>
 
   @override
   CameraDescription get description => const CameraDescription(
-      name: '', lensDirection: CameraLensDirection.back, sensorOrientation: 0);
+        name: '',
+        lensDirection: CameraLensDirection.back,
+        sensorOrientation: 0,
+        supportedOutputFormats: [],
+      );
 
   @override
   bool get enableAudio => false;

@@ -164,6 +164,7 @@ class CameraPlugin extends CameraPlatform {
             name: cameraLabel,
             lensDirection: lensDirection,
             sensorOrientation: 0,
+            supportedOutputFormats: [],
           );
 
           final CameraMetadata cameraMetadata = CameraMetadata(

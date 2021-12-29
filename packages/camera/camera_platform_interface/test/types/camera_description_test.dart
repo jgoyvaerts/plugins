@@ -30,6 +30,7 @@ void main() {
         name: 'Test',
         lensDirection: CameraLensDirection.front,
         sensorOrientation: 90,
+        supportedOutputFormats: [],
       );
 
       expect(description.name, 'Test');
@@ -42,11 +43,13 @@ void main() {
         name: 'Test',
         lensDirection: CameraLensDirection.front,
         sensorOrientation: 90,
+        supportedOutputFormats: [],
       );
       const CameraDescription secondDescription = CameraDescription(
         name: 'Test',
         lensDirection: CameraLensDirection.front,
         sensorOrientation: 90,
+        supportedOutputFormats: [],
       );
 
       expect(firstDescription == secondDescription, true);
@@ -57,11 +60,13 @@ void main() {
         name: 'Test',
         lensDirection: CameraLensDirection.front,
         sensorOrientation: 90,
+        supportedOutputFormats: [],
       );
       const CameraDescription secondDescription = CameraDescription(
         name: 'Testing',
         lensDirection: CameraLensDirection.front,
         sensorOrientation: 90,
+        supportedOutputFormats: [],
       );
 
       expect(firstDescription == secondDescription, false);
@@ -72,11 +77,13 @@ void main() {
         name: 'Test',
         lensDirection: CameraLensDirection.front,
         sensorOrientation: 90,
+        supportedOutputFormats: [],
       );
       const CameraDescription secondDescription = CameraDescription(
         name: 'Test',
         lensDirection: CameraLensDirection.back,
         sensorOrientation: 90,
+        supportedOutputFormats: [],
       );
 
       expect(firstDescription == secondDescription, false);
@@ -87,11 +94,13 @@ void main() {
         name: 'Test',
         lensDirection: CameraLensDirection.front,
         sensorOrientation: 0,
+        supportedOutputFormats: [],
       );
       const CameraDescription secondDescription = CameraDescription(
         name: 'Test',
         lensDirection: CameraLensDirection.front,
         sensorOrientation: 90,
+        supportedOutputFormats: [],
       );
 
       expect(firstDescription == secondDescription, true);
@@ -103,6 +112,7 @@ void main() {
         name: 'Test',
         lensDirection: CameraLensDirection.front,
         sensorOrientation: 0,
+        supportedOutputFormats: [],
       );
       final int expectedHashCode =
           Object.hash(description.name, description.lensDirection);

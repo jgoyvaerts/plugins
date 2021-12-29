@@ -4,6 +4,8 @@
 
 import 'package:flutter/foundation.dart';
 
+import 'image_format_group.dart';
+
 /// The direction the camera is facing.
 enum CameraLensDirection {
   /// Front facing camera (a user looking at the screen is seen by the camera).
@@ -24,6 +26,7 @@ class CameraDescription {
     required this.name,
     required this.lensDirection,
     required this.sensorOrientation,
+    required this.supportedOutputFormats,
   });
 
   /// The name of the camera device.
@@ -41,6 +44,9 @@ class CameraDescription {
   /// is from top to bottom in the sensor's coordinate system.
   final int sensorOrientation;
 
+  /// A list of all output formats supported by this camera
+  final List<OutputFormat> supportedOutputFormats;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -57,4 +63,24 @@ class CameraDescription {
     return '${objectRuntimeType(this, 'CameraDescription')}('
         '$name, $lensDirection, $sensorOrientation)';
   }
+}
+
+/// Supported output formats of a camera device
+
+class OutputFormat {
+  /// Creates a new OutputFormat with the given properties
+  OutputFormat({
+    required this.format,
+    required this.width,
+    required this.height,
+  });
+
+  /// The image format of this OutputFormat, for example ImageFormatGroup.jpeg
+  final ImageFormatGroup format;
+
+  /// The width of this OutputFormat
+  final int width;
+
+  /// The height of this OutputFormat
+  final int height;
 }

@@ -6,10 +6,14 @@ package io.flutter.plugins.camera;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
+import android.hardware.camera2.params.StreamConfigurationMap;
+import android.util.Size;
+
 import io.flutter.embedding.engine.systemchannels.PlatformChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -112,6 +116,18 @@ public final class CameraUtils {
       details.put("name", cameraName);
       int sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
       details.put("sensorOrientation", sensorOrientation);
+
+      StreamConfigurationMap configurationMap = (StreamConfigurationMap)characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+      Size[] jpegOutputSizes = configurationMap.getOutputSizes((int) ImageFormat.JPEG);
+      List<HashMap<String, Object>> supportedOutputFormats = new ArrayList<HashMap<String, Object>>();
+      for (Size outputSize : jpegOutputSizes) {
+        HashMap<String,Object> outputFormat = new HashMap<>();
+        outputFormat.put("format", "jpeg");
+        outputFormat.put("width", outputSize.getWidth());
+        outputFormat.put("height", outputSize.getHeight());
+        supportedOutputFormats.add(outputFormat);
+      }
+      details.put("supportedOutputFormats", supportedOutputFormats);
 
       int lensFacing = characteristics.get(CameraCharacteristics.LENS_FACING);
       switch (lensFacing) {

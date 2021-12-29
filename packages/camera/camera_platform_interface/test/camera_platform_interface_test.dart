@@ -162,6 +162,7 @@ void main() {
             name: 'back',
             lensDirection: CameraLensDirection.back,
             sensorOrientation: 0,
+            supportedOutputFormats: [],
           ),
           ResolutionPreset.high,
         ),

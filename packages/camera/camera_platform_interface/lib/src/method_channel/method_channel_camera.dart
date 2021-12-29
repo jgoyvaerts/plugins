@@ -76,10 +76,33 @@ class MethodChannelCamera extends CameraPlatform {
           lensDirection:
               parseCameraLensDirection(camera['lensFacing']! as String),
           sensorOrientation: camera['sensorOrientation']! as int,
+          supportedOutputFormats: _parseSupportedOutputFormats(
+              camera['supportedOutputFormats'] as List<dynamic>),
         );
       }).toList();
     } on PlatformException catch (e) {
       throw CameraException(e.code, e.message);
+    }
+  }
+
+  List<OutputFormat> _parseSupportedOutputFormats(
+      List<dynamic> supportedOutputFormats) {
+    return supportedOutputFormats.map((dynamic obj) {
+      final Map<dynamic, dynamic> outputFormat = obj as Map<dynamic, dynamic>;
+      return OutputFormat(
+        format: _parseImageFormatGroup(outputFormat['format'] as String),
+        width: outputFormat['width'] as int,
+        height: outputFormat['height'] as int,
+      );
+    }).toList();
+  }
+
+  ImageFormatGroup _parseImageFormatGroup(String format) {
+    switch (format) {
+      case 'jpeg':
+        return ImageFormatGroup.jpeg;
+      default:
+        return ImageFormatGroup.unknown;
     }
   }
 
@@ -235,7 +258,8 @@ class MethodChannelCamera extends CameraPlatform {
 
   @override
   Future<CameraImage> takePictureAsBytes(int cameraId) async {
-    final image = await _channel.invokeMethod<Map<dynamic, dynamic>>(
+    final Map<dynamic, dynamic>? image =
+        await _channel.invokeMethod<Map<dynamic, dynamic>>(
       'takePictureAsBytes',
       <String, dynamic>{'cameraId': cameraId},
     );

@@ -332,11 +332,13 @@ void main() {
               name: firstVideoDevice.label!,
               lensDirection: CameraLensDirection.front,
               sensorOrientation: 0,
+              supportedOutputFormats: [],
             ),
             CameraDescription(
               name: secondVideoDevice.label!,
               lensDirection: CameraLensDirection.back,
               sensorOrientation: 0,
+              supportedOutputFormats: [],
             )
           ]),
         );
@@ -517,6 +519,7 @@ void main() {
           name: 'name',
           lensDirection: CameraLensDirection.front,
           sensorOrientation: 0,
+          supportedOutputFormats: [],
         );
 
         const CameraMetadata cameraMetadata = CameraMetadata(
@@ -621,6 +624,7 @@ void main() {
               name: 'name',
               lensDirection: CameraLensDirection.back,
               sensorOrientation: 0,
+              supportedOutputFormats: [],
             ),
             ResolutionPreset.ultraHigh,
           ),

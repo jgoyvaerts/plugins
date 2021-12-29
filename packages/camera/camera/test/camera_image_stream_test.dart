@@ -24,6 +24,7 @@ void main() {
         const CameraDescription(
             name: 'cam',
             lensDirection: CameraLensDirection.back,
+            supportedOutputFormats: [],
             sensorOrientation: 90),
         ResolutionPreset.max);
 
@@ -51,6 +52,7 @@ void main() {
         const CameraDescription(
             name: 'cam',
             lensDirection: CameraLensDirection.back,
+            supportedOutputFormats: [],
             sensorOrientation: 90),
         ResolutionPreset.max);
 
@@ -74,6 +76,7 @@ void main() {
         const CameraDescription(
             name: 'cam',
             lensDirection: CameraLensDirection.back,
+            supportedOutputFormats: [],
             sensorOrientation: 90),
         ResolutionPreset.max);
     await cameraController.initialize();
@@ -90,11 +93,20 @@ void main() {
   });
 
   test('startImageStream() calls CameraPlatform', () async {
+    MethodChannelMock cameraChannelMock = MethodChannelMock(
+        channelName: 'plugins.flutter.io/camera',
+        methods: {'startImageStream': {}});
+    MethodChannelMock streamChannelMock = MethodChannelMock(
+        channelName: 'plugins.flutter.io/camera/imageStream',
+        methods: {'listen': {}});
+
     final CameraController cameraController = CameraController(
         const CameraDescription(
-            name: 'cam',
-            lensDirection: CameraLensDirection.back,
-            sensorOrientation: 90),
+          name: 'cam',
+          lensDirection: CameraLensDirection.back,
+          sensorOrientation: 90,
+          supportedOutputFormats: [],
+        ),
         ResolutionPreset.max);
     await cameraController.initialize();
 
@@ -107,9 +119,11 @@ void main() {
   test('stopImageStream() throws $CameraException when uninitialized', () {
     final CameraController cameraController = CameraController(
         const CameraDescription(
-            name: 'cam',
-            lensDirection: CameraLensDirection.back,
-            sensorOrientation: 90),
+          name: 'cam',
+          lensDirection: CameraLensDirection.back,
+          sensorOrientation: 90,
+          supportedOutputFormats: [],
+        ),
         ResolutionPreset.max);
 
     expect(
@@ -134,9 +148,11 @@ void main() {
       () async {
     final CameraController cameraController = CameraController(
         const CameraDescription(
-            name: 'cam',
-            lensDirection: CameraLensDirection.back,
-            sensorOrientation: 90),
+          name: 'cam',
+          lensDirection: CameraLensDirection.back,
+          sensorOrientation: 90,
+          supportedOutputFormats: [],
+        ),
         ResolutionPreset.max);
     await cameraController.initialize();
 
@@ -156,9 +172,11 @@ void main() {
       () async {
     final CameraController cameraController = CameraController(
         const CameraDescription(
-            name: 'cam',
-            lensDirection: CameraLensDirection.back,
-            sensorOrientation: 90),
+          name: 'cam',
+          lensDirection: CameraLensDirection.back,
+          sensorOrientation: 90,
+          supportedOutputFormats: [],
+        ),
         ResolutionPreset.max);
     await cameraController.initialize();
 
@@ -172,11 +190,20 @@ void main() {
   });
 
   test('stopImageStream() intended behaviour', () async {
+    MethodChannelMock cameraChannelMock = MethodChannelMock(
+        channelName: 'plugins.flutter.io/camera',
+        methods: {'startImageStream': {}, 'stopImageStream': {}});
+    MethodChannelMock streamChannelMock = MethodChannelMock(
+        channelName: 'plugins.flutter.io/camera/imageStream',
+        methods: {'listen': {}, 'cancel': {}});
+
     final CameraController cameraController = CameraController(
         const CameraDescription(
-            name: 'cam',
-            lensDirection: CameraLensDirection.back,
-            sensorOrientation: 90),
+          name: 'cam',
+          lensDirection: CameraLensDirection.back,
+          sensorOrientation: 90,
+          supportedOutputFormats: [],
+        ),
         ResolutionPreset.max);
     await cameraController.initialize();
     await cameraController.startImageStream((CameraImage image) => null);
