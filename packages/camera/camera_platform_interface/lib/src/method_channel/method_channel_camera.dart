@@ -110,6 +110,8 @@ class MethodChannelCamera extends CameraPlatform {
   Future<int> createCamera(
     CameraDescription cameraDescription,
     ResolutionPreset? resolutionPreset, {
+    OutputFormat? outputFormat,
+    OutputFormat? previewFormat,
     bool enableAudio = false,
   }) async {
     try {
@@ -119,6 +121,10 @@ class MethodChannelCamera extends CameraPlatform {
         'resolutionPreset': resolutionPreset != null
             ? _serializeResolutionPreset(resolutionPreset)
             : null,
+        'outputWidth': outputFormat?.width,
+        'outputHeight': outputFormat?.height,
+        'previewWidth': previewFormat?.width,
+        'previewHeight': previewFormat?.height,
         'enableAudio': enableAudio,
       });
 

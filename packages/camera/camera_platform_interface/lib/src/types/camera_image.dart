@@ -137,6 +137,7 @@ class CameraImage {
         lensAperture = data['lensAperture'] as double?,
         sensorExposureTime = data['sensorExposureTime'] as int?,
         sensorSensitivity = data['sensorSensitivity'] as double?,
+        thumbnail = data['thumbnail'] as Uint8List?,
         planes = List<Plane>.unmodifiable((data['planes'] as List<dynamic>)
             .map<Plane>((dynamic planeData) =>
                 Plane._fromPlatformData(planeData as Map<dynamic, dynamic>)));
@@ -163,6 +164,9 @@ class CameraImage {
   ///
   /// The number of planes is determined by the format of the image.
   final List<Plane> planes;
+
+  /// The thumbnail bytes of this image, in JPEG
+  final Uint8List? thumbnail;
 
   /// The aperture settings for this image.
   ///

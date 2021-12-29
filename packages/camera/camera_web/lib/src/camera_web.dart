@@ -201,6 +201,8 @@ class CameraPlugin extends CameraPlatform {
   Future<int> createCamera(
     CameraDescription cameraDescription,
     ResolutionPreset? resolutionPreset, {
+    OutputFormat? outputFormat,
+    OutputFormat? previewFormat,
     bool enableAudio = false,
   }) async {
     try {

@@ -224,6 +224,8 @@ class CameraController extends ValueNotifier<CameraValue> {
     this.resolutionPreset, {
     this.enableAudio = true,
     this.imageFormatGroup,
+    this.outputFormat,
+    this.previewFormat,
   }) : super(const CameraValue.uninitialized());
 
   /// The properties of the camera device controlled by this controller.
@@ -235,10 +237,13 @@ class CameraController extends ValueNotifier<CameraValue> {
   /// if unavailable a lower resolution will be used.
   ///
   /// See also: [ResolutionPreset].
-  final ResolutionPreset resolutionPreset;
+  final ResolutionPreset? resolutionPreset;
 
   /// Whether to include audio when recording a video.
   final bool enableAudio;
+
+  final OutputFormat? outputFormat;
+  final OutputFormat? previewFormat;
 
   /// The [ImageFormatGroup] describes the output of the raw image format.
   ///
@@ -291,6 +296,8 @@ class CameraController extends ValueNotifier<CameraValue> {
       _cameraId = await CameraPlatform.instance.createCamera(
         description,
         resolutionPreset,
+        outputFormat: outputFormat,
+        previewFormat: previewFormat,
         enableAudio: enableAudio,
       );
 

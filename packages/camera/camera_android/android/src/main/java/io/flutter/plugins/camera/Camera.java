@@ -8,6 +8,8 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -63,6 +65,8 @@ import io.flutter.plugins.camera.media.MediaRecorderBuilder;
 import io.flutter.plugins.camera.types.CameraCaptureProperties;
 import io.flutter.plugins.camera.types.CaptureTimeoutsWrapper;
 import io.flutter.view.TextureRegistry.SurfaceTextureEntry;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -147,6 +151,11 @@ class Camera
 
   private File captureFile;
 
+  private Integer outputWidth;
+  private Integer outputHeight;
+  private Integer previewWidth;
+  private Integer previewHeight;
+
   /** Holds the current capture timeouts */
   private CaptureTimeoutsWrapper captureTimeouts;
   /** Holds the last known capture properties */
@@ -200,6 +209,10 @@ class Camera
       final DartMessenger dartMessenger,
       final CameraProperties cameraProperties,
       final ResolutionPreset resolutionPreset,
+      final Integer outputWidth,
+      final Integer outputHeight,
+      final Integer previewWidth,
+      final Integer previewHeight,
       final boolean enableAudio) {
 
     if (activity == null) {
@@ -215,6 +228,11 @@ class Camera
     this.cameraFeatures =
         CameraFeatures.init(
             cameraFeatureFactory, cameraProperties, activity, dartMessenger, resolutionPreset);
+
+    this.previewWidth = previewWidth;
+    this.previewHeight = previewHeight;
+    this.outputHeight = outputHeight;
+    this.outputWidth = outputWidth;
 
     // Create capture callback.
     captureTimeouts = new CaptureTimeoutsWrapper(3000, 3000);
@@ -290,11 +308,16 @@ class Camera
       return;
     }
 
+    if(outputWidth == null) outputWidth = resolutionFeature.getCaptureSize().getWidth();
+    if(outputHeight == null) outputHeight = resolutionFeature.getCaptureSize().getWidth();
+    if(previewWidth == null) previewWidth = cameraFeatures.getResolution().getPreviewSize().getWidth();
+    if(previewHeight == null) previewHeight = cameraFeatures.getResolution().getPreviewSize().getWidth();
+
     // Always capture using JPEG format.
     pictureImageReader =
         ImageReader.newInstance(
-            resolutionFeature.getCaptureSize().getWidth(),
-            resolutionFeature.getCaptureSize().getHeight(),
+            outputWidth,
+            outputHeight,
             ImageFormat.JPEG,
             1);
 
@@ -306,8 +329,8 @@ class Camera
     }
     imageStreamReader =
         ImageReader.newInstance(
-            resolutionFeature.getPreviewSize().getWidth(),
-            resolutionFeature.getPreviewSize().getHeight(),
+            previewWidth,
+                previewHeight,
             imageFormat,
             1);
 
@@ -396,6 +419,8 @@ class Camera
 
     // Create a new capture builder.
     previewRequestBuilder = cameraDevice.createCaptureRequest(templateType);
+    previewRequestBuilder.set(
+          CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
 
     // Build Flutter surface to render to.
     ResolutionFeature resolutionFeature = cameraFeatures.getResolution();
@@ -407,7 +432,7 @@ class Camera
     previewRequestBuilder.addTarget(flutterSurface);
 
     List<Surface> remainingSurfaces = Arrays.asList(surfaces);
-    if (templateType != CameraDevice.TEMPLATE_PREVIEW) {
+    if (templateType != CameraDevice.TEMPLATE_PREVIEW && templateType != CameraDevice.TEMPLATE_ZERO_SHUTTER_LAG) {
       // If it is not preview mode, add all surfaces as targets.
       for (Surface surface : remainingSurfaces) {
         previewRequestBuilder.addTarget(surface);
@@ -578,8 +603,10 @@ class Camera
 
     final AutoFocusFeature autoFocusFeature = cameraFeatures.getAutoFocus();
     final boolean isAutoFocusSupported = autoFocusFeature.checkIsSupported();
+    Log.i(TAG, "isAutoFocusSupported:"+Boolean.toString(isAutoFocusSupported));
+    Log.i(TAG, "autoFocusFeature:"+autoFocusFeature.getValue());
     if (isAutoFocusSupported && autoFocusFeature.getValue() == FocusMode.auto) {
-      runPictureAutoFocus();
+      takePictureAfterPrecapture();
     } else {
       runPrecaptureSequence();
     }
@@ -605,10 +632,11 @@ class Camera
         public void run(){
           Image img = reader.acquireNextImage();
           List<Map<String, Object>> planes = new ArrayList<>();
+          byte[] bytes = new byte[0];
           for (Image.Plane plane : img.getPlanes()) {
             ByteBuffer buffer = plane.getBuffer();
 
-            byte[] bytes = new byte[buffer.remaining()];
+            bytes = new byte[buffer.remaining()];
             buffer.get(bytes, 0, bytes.length);
 
             Map<String, Object> planeBuffer = new HashMap<>();
@@ -619,7 +647,7 @@ class Camera
             planes.add(planeBuffer);
           }
 
-          Map<String, Object> imageBuffer = new HashMap<>();
+          HashMap<String, Object> imageBuffer = new HashMap<>();
           imageBuffer.put("width", img.getWidth());
           imageBuffer.put("height", img.getHeight());
           imageBuffer.put("format", img.getFormat());
@@ -629,6 +657,21 @@ class Camera
           Integer sensorSensitivity = captureProps.getLastSensorSensitivity();
           imageBuffer.put(
                   "sensorSensitivity", sensorSensitivity == null ? null : (double) sensorSensitivity);
+
+          BitmapFactory.Options options = new BitmapFactory.Options();
+          options.inJustDecodeBounds = true;
+          BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+          if(previewWidth == null) previewWidth = cameraFeatures.getResolution().getPreviewSize().getWidth();
+          if(previewHeight == null) previewHeight = cameraFeatures.getResolution().getPreviewSize().getWidth();
+
+          options.inSampleSize = calculateSampleSize(options, previewWidth, previewHeight);
+          options.inJustDecodeBounds = false;
+          Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+
+          ByteArrayOutputStream bos = new ByteArrayOutputStream();
+          bitmap.compress(Bitmap.CompressFormat.JPEG, 90, bos);
+          byte[] thumbnailBytes = bos.toByteArray();
+          imageBuffer.put("thumbnail", thumbnailBytes);
             dartMessenger.finish(flutterResult, imageBuffer);
           img.close();
         }
@@ -639,11 +682,32 @@ class Camera
 
     final AutoFocusFeature autoFocusFeature = cameraFeatures.getAutoFocus();
     final boolean isAutoFocusSupported = autoFocusFeature.checkIsSupported();
+    Log.i(TAG, "isAutoFocusSupported:"+Boolean.toString(isAutoFocusSupported));
+    Log.i(TAG, "autoFocusFeature:"+autoFocusFeature.getValue());
     if (isAutoFocusSupported && autoFocusFeature.getValue() == FocusMode.auto) {
-      runPictureAutoFocus();
+      takePictureAfterPrecapture();
     } else {
       runPrecaptureSequence();
     }
+  }
+
+  private int calculateSampleSize(BitmapFactory.Options options, Integer reqWidth, Integer reqHeight){
+    float height = options.outHeight;
+    float width = options.outWidth;
+    double inSampleSize = 1D;
+
+    if (height > reqHeight || width > reqWidth)
+    {
+      int halfHeight = (int)(height / 2);
+      int halfWidth = (int)(width / 2);
+
+      while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth)
+      {
+        inSampleSize *= 2;
+      }
+    }
+
+    return (int)inSampleSize;
   }
 
   /**
@@ -695,7 +759,7 @@ class Camera
     // This is the CaptureRequest.Builder that is used to take a picture.
     CaptureRequest.Builder stillBuilder;
     try {
-      stillBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_ZERO_SHUTTER_LAG);
+      stillBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
     } catch (CameraAccessException e) {
       dartMessenger.error(flutterResult, "cameraAccess", e.getMessage(), null);
       return;
@@ -721,15 +785,7 @@ class Camera
             : getDeviceOrientationManager().getPhotoOrientation(lockedOrientation));
 
     CameraCaptureSession.CaptureCallback captureCallback =
-        new CameraCaptureSession.CaptureCallback() {
-          @Override
-          public void onCaptureCompleted(
-              @NonNull CameraCaptureSession session,
-              @NonNull CaptureRequest request,
-              @NonNull TotalCaptureResult result) {
-            unlockAutoFocus();
-          }
-        };
+        new CameraCaptureSession.CaptureCallback() { };
 
     try {
       captureSession.stopRepeating();
@@ -1149,7 +1205,7 @@ class Camera
     if (pictureImageReader == null || pictureImageReader.getSurface() == null) return;
     Log.i(TAG, "startPreview");
 
-    createCaptureSession(CameraDevice.TEMPLATE_PREVIEW, pictureImageReader.getSurface());
+    createCaptureSession(CameraDevice.TEMPLATE_ZERO_SHUTTER_LAG, pictureImageReader.getSurface());
   }
 
   public void startPreviewWithImageStream(EventChannel imageStreamChannel)

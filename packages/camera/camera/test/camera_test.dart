@@ -16,13 +16,17 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 List<CameraDescription> get mockAvailableCameras => <CameraDescription>[
       const CameraDescription(
-          name: 'camBack',
-          lensDirection: CameraLensDirection.back,
-          sensorOrientation: 90),
+        name: 'camBack',
+        lensDirection: CameraLensDirection.back,
+        sensorOrientation: 90,
+        supportedOutputFormats: [],
+      ),
       const CameraDescription(
-          name: 'camFront',
-          lensDirection: CameraLensDirection.front,
-          sensorOrientation: 180),
+        name: 'camFront',
+        lensDirection: CameraLensDirection.front,
+        sensorOrientation: 180,
+        supportedOutputFormats: [],
+      ),
     ];
 
 int get mockInitializeCamera => 13;
@@ -100,9 +104,11 @@ void main() {
     test('Can be initialized', () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
 
@@ -114,9 +120,11 @@ void main() {
     test('can be disposed', () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
 
@@ -132,9 +140,11 @@ void main() {
     test('initialize() throws CameraException when disposed', () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
 
@@ -159,9 +169,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
 
       mockPlatformException = true;
@@ -180,9 +192,11 @@ void main() {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
       final CameraController cameraController = CameraController(
         const CameraDescription(
-            name: 'cam',
-            lensDirection: CameraLensDirection.back,
-            sensorOrientation: 90),
+          name: 'cam',
+          lensDirection: CameraLensDirection.back,
+          sensorOrientation: 90,
+          supportedOutputFormats: [],
+        ),
         ResolutionPreset.max,
         imageFormatGroup: ImageFormatGroup.yuv420,
       );
@@ -195,9 +209,11 @@ void main() {
     test('prepareForVideoRecording() calls $CameraPlatform ', () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
 
@@ -209,9 +225,11 @@ void main() {
     test('takePicture() throws $CameraException when uninitialized ', () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       expect(
         cameraController.takePicture(),
@@ -235,9 +253,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
 
@@ -255,9 +275,11 @@ void main() {
     test('takePicture() returns $XFile', () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
       final XFile xFile = await cameraController.takePicture();
@@ -269,9 +291,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
 
@@ -290,9 +314,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
 
       expect(
@@ -316,9 +342,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
 
       await cameraController.initialize();
@@ -340,9 +368,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
 
       await cameraController.initialize();
@@ -363,9 +393,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
 
       expect(
@@ -389,9 +421,11 @@ void main() {
     test('getMaxZoomLevel() throws $CameraException when disposed', () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
 
       await cameraController.initialize();
@@ -420,9 +454,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
 
       await cameraController.initialize();
@@ -447,9 +483,11 @@ void main() {
     test('getMaxZoomLevel() returns max zoom level.', () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
 
       await cameraController.initialize();
@@ -464,9 +502,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
 
       expect(
@@ -490,9 +530,11 @@ void main() {
     test('getMinZoomLevel() throws $CameraException when disposed', () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
 
       await cameraController.initialize();
@@ -521,9 +563,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
 
       await cameraController.initialize();
@@ -548,9 +592,11 @@ void main() {
     test('getMinZoomLevel() returns max zoom level.', () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
 
       await cameraController.initialize();
@@ -564,9 +610,11 @@ void main() {
     test('setZoomLevel() throws $CameraException when uninitialized', () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
 
       expect(
@@ -590,9 +638,11 @@ void main() {
     test('setZoomLevel() throws $CameraException when disposed', () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
 
       await cameraController.initialize();
@@ -621,9 +671,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
 
       await cameraController.initialize();
@@ -652,9 +704,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
 
       await cameraController.initialize();
@@ -667,9 +721,11 @@ void main() {
     test('setFlashMode() calls $CameraPlatform', () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
 
@@ -684,9 +740,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
 
@@ -711,9 +769,11 @@ void main() {
     test('setExposureMode() calls $CameraPlatform', () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
 
@@ -728,9 +788,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
 
@@ -755,9 +817,11 @@ void main() {
     test('setExposurePoint() calls $CameraPlatform', () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
 
@@ -772,9 +836,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
 
@@ -799,9 +865,11 @@ void main() {
     test('getMinExposureOffset() calls $CameraPlatform', () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
 
@@ -820,9 +888,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
 
@@ -847,9 +917,11 @@ void main() {
     test('getMaxExposureOffset() calls $CameraPlatform', () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
 
@@ -868,9 +940,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
 
@@ -895,9 +969,11 @@ void main() {
     test('getExposureOffsetStepSize() calls $CameraPlatform', () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
 
@@ -917,9 +993,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
 
@@ -944,9 +1022,11 @@ void main() {
     test('setExposureOffset() calls $CameraPlatform', () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
       when(CameraPlatform.instance
@@ -973,9 +1053,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
       when(CameraPlatform.instance
@@ -1010,9 +1092,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
       when(CameraPlatform.instance
@@ -1067,9 +1151,11 @@ void main() {
     test('setExposureOffset() rounds offset to nearest step', () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
       when(CameraPlatform.instance
@@ -1141,9 +1227,11 @@ void main() {
     test('pausePreview() calls $CameraPlatform', () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
       cameraController.value = cameraController.value
@@ -1162,9 +1250,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
       cameraController.value =
@@ -1180,8 +1270,8 @@ void main() {
     test(
         'pausePreview() sets previewPauseOrientation according to locked orientation',
         () async {
-      final CameraController cameraController = CameraController(
-          const CameraDescription(
+      final final CameraController cameraController = CameraController(
+          const const CameraDescription(
               name: 'cam',
               lensDirection: CameraLensDirection.back,
               sensorOrientation: 90),
@@ -1204,9 +1294,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
       when(CameraPlatform.instance.pausePreview(cameraController.cameraId))
@@ -1227,19 +1319,11 @@ void main() {
     });
 
     test('resumePreview() calls $CameraPlatform', () async {
-      final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
-          ResolutionPreset.max);
-      await cameraController.initialize();
-      cameraController.value =
-          cameraController.value.copyWith(isPreviewPaused: true);
-
-      await cameraController.resumePreview();
-
-      verify(CameraPlatform.instance.resumePreview(cameraController.cameraId))
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
           .called(1);
       expect(cameraController.value.isPreviewPaused, equals(false));
     });
@@ -1248,9 +1332,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
       cameraController.value =
@@ -1267,9 +1353,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
       cameraController.value =
@@ -1294,9 +1382,11 @@ void main() {
     test('lockCaptureOrientation() calls $CameraPlatform', () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
 
@@ -1321,9 +1411,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
       when(CameraPlatform.instance.lockCaptureOrientation(
@@ -1347,9 +1439,11 @@ void main() {
     test('unlockCaptureOrientation() calls $CameraPlatform', () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
 
@@ -1366,9 +1460,11 @@ void main() {
         () async {
       final CameraController cameraController = CameraController(
           const CameraDescription(
-              name: 'cam',
-              lensDirection: CameraLensDirection.back,
-              sensorOrientation: 90),
+            name: 'cam',
+            lensDirection: CameraLensDirection.back,
+            sensorOrientation: 90,
+            supportedOutputFormats: [],
+          ),
           ResolutionPreset.max);
       await cameraController.initialize();
       when(CameraPlatform.instance
@@ -1420,6 +1516,8 @@ class MockCameraPlatform extends Mock
   Future<int> createCamera(
     CameraDescription description,
     ResolutionPreset? resolutionPreset, {
+    OutputFormat? outputFormat,
+    OutputFormat? previewFormat,
     bool enableAudio = false,
   }) =>
       mockPlatformException
@@ -1544,6 +1642,7 @@ class MockCameraDescription extends CameraDescription {
           name: 'Test',
           lensDirection: CameraLensDirection.back,
           sensorOrientation: 0,
+          supportedOutputFormats: [],
         );
 
   @override

@@ -644,11 +644,16 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
       await oldController.dispose();
     }
 
+    var outputFormat = cameraDescription.supportedOutputFormats.first;
+    var previewFormat = cameraDescription.supportedOutputFormats[8];
+
     final CameraController cameraController = CameraController(
       cameraDescription,
       kIsWeb ? ResolutionPreset.max : ResolutionPreset.medium,
       enableAudio: enableAudio,
       imageFormatGroup: ImageFormatGroup.jpeg,
+      outputFormat: outputFormat,
+      previewFormat: previewFormat,
     );
 
     controller = cameraController;
@@ -726,6 +731,15 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
           imageFile = file;
           videoController?.dispose();
           videoController = null;
+          showDialog(
+              context: context,
+              builder: (context) => Image.file(
+                    File(file!.path),
+                    height: 500,
+                    width: 640,
+                    // cacheHeight: 500,
+                    // cacheWidth: 640,
+                  ));
         });
         if (file != null) {
           showInSnackBar('Picture saved to ${file.path}');
@@ -736,17 +750,18 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
 
   void onTakePictureButtonPressed2() {
     takePictureAsBytes().then((CameraImage? img) async {
+      print("received picture");
       if (mounted && img != null) {
-        var pic = await convertImagetoPng(img);
+        // var pic = await convertImagetoPng(img);
         await showDialog(
             context: context,
-            builder: (context) => SimpleDialog(children: [
-                  Image.memory(
-                    Uint8List.fromList(pic),
-                    height: 360,
-                    width: 640,
-                  )
-                ]));
+            builder: (context) => Image.memory(
+                  Uint8List.fromList(img.thumbnail),
+                  height: 500,
+                  width: 640,
+                  // cacheHeight: 500,
+                  // cacheWidth: 640,
+                ));
       }
     });
   }
