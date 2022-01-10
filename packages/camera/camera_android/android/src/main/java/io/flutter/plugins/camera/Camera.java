@@ -11,6 +11,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
+import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -23,6 +24,7 @@ import android.hardware.camera2.params.OutputConfiguration;
 import android.hardware.camera2.params.SessionConfiguration;
 import android.media.CamcorderProfile;
 import android.media.EncoderProfiles;
+import android.media.ExifInterface;
 import android.media.Image;
 import android.media.ImageReader;
 import android.media.MediaRecorder;
@@ -38,6 +40,7 @@ import android.view.Display;
 import android.view.Surface;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.VisibleForTesting;
 import io.flutter.embedding.engine.systemchannels.PlatformChannel;
 import io.flutter.plugin.common.EventChannel;
@@ -66,9 +69,11 @@ import io.flutter.plugins.camera.types.CameraCaptureProperties;
 import io.flutter.plugins.camera.types.CaptureTimeoutsWrapper;
 import io.flutter.view.TextureRegistry.SurfaceTextureEntry;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -628,55 +633,71 @@ class Camera
       return;
     }
 
-    imageAvailableHandler = reader -> new Runnable(){
-        public void run(){
-          Image img = reader.acquireNextImage();
-          List<Map<String, Object>> planes = new ArrayList<>();
-          byte[] bytes = new byte[0];
-          for (Image.Plane plane : img.getPlanes()) {
-            ByteBuffer buffer = plane.getBuffer();
+    imageAvailableHandler = reader -> new Runnable() {
+      @RequiresApi(api = VERSION_CODES.N)
+      public void run() {
+        Image img = reader.acquireNextImage();
+        List<Map<String, Object>> planes = new ArrayList<>();
+        byte[] bytes = new byte[0];
+        for (Image.Plane plane : img.getPlanes()) {
+          ByteBuffer buffer = plane.getBuffer();
 
-            bytes = new byte[buffer.remaining()];
-            buffer.get(bytes, 0, bytes.length);
+          bytes = new byte[buffer.remaining()];
+          buffer.get(bytes, 0, bytes.length);
 
-            Map<String, Object> planeBuffer = new HashMap<>();
-            planeBuffer.put("bytesPerRow", plane.getRowStride());
-            planeBuffer.put("bytesPerPixel", plane.getPixelStride());
-            planeBuffer.put("bytes", bytes);
+          Map<String, Object> planeBuffer = new HashMap<>();
+          planeBuffer.put("bytesPerRow", plane.getRowStride());
+          planeBuffer.put("bytesPerPixel", plane.getPixelStride());
+          planeBuffer.put("bytes", bytes);
 
-            planes.add(planeBuffer);
-          }
-
-          HashMap<String, Object> imageBuffer = new HashMap<>();
-          imageBuffer.put("width", img.getWidth());
-          imageBuffer.put("height", img.getHeight());
-          imageBuffer.put("format", img.getFormat());
-          imageBuffer.put("planes", planes);
-          imageBuffer.put("lensAperture", captureProps.getLastLensAperture());
-          imageBuffer.put("sensorExposureTime", captureProps.getLastSensorExposureTime());
-          Integer sensorSensitivity = captureProps.getLastSensorSensitivity();
-          imageBuffer.put(
-                  "sensorSensitivity", sensorSensitivity == null ? null : (double) sensorSensitivity);
-
-          BitmapFactory.Options options = new BitmapFactory.Options();
-          options.inJustDecodeBounds = true;
-          BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-          if(previewWidth == null) previewWidth = cameraFeatures.getResolution().getPreviewSize().getWidth();
-          if(previewHeight == null) previewHeight = cameraFeatures.getResolution().getPreviewSize().getWidth();
-
-          options.inSampleSize = calculateSampleSize(options, previewWidth, previewHeight);
-          options.inJustDecodeBounds = false;
-          Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-
-          ByteArrayOutputStream bos = new ByteArrayOutputStream();
-          bitmap.compress(Bitmap.CompressFormat.JPEG, 90, bos);
-          byte[] thumbnailBytes = bos.toByteArray();
-          imageBuffer.put("thumbnail", thumbnailBytes);
-            dartMessenger.finish(flutterResult, imageBuffer);
-          img.close();
+          planes.add(planeBuffer);
         }
-    };
 
+        HashMap<String, Object> imageBuffer = new HashMap<>();
+        imageBuffer.put("width", img.getWidth());
+        imageBuffer.put("height", img.getHeight());
+        imageBuffer.put("format", img.getFormat());
+        imageBuffer.put("planes", planes);
+        imageBuffer.put("lensAperture", captureProps.getLastLensAperture());
+        imageBuffer.put("sensorExposureTime", captureProps.getLastSensorExposureTime());
+        Integer sensorSensitivity = captureProps.getLastSensorSensitivity();
+        imageBuffer.put(
+                "sensorSensitivity", sensorSensitivity == null ? null : (double) sensorSensitivity);
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+        if (previewWidth == null)
+          previewWidth = cameraFeatures.getResolution().getPreviewSize().getWidth();
+        if (previewHeight == null)
+          previewHeight = cameraFeatures.getResolution().getPreviewSize().getWidth();
+
+        options.inSampleSize = calculateSampleSize(options, previewWidth, previewHeight);
+        options.inJustDecodeBounds = false;
+        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+        InputStream originalImageStream = new ByteArrayInputStream(bytes);
+
+        ExifInterface exif = null;
+        try {
+          exif = new ExifInterface(originalImageStream);
+          String exifOrientation = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
+          int rotationInDegrees = ExifToDegrees(exifOrientation);
+          Matrix matrix = new Matrix();
+          matrix.preRotate(rotationInDegrees);
+          bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, bos);
+        byte[] thumbnailBytes = bos.toByteArray();
+        imageBuffer.put("thumbnail", thumbnailBytes);
+        dartMessenger.finish(flutterResult, imageBuffer);
+        img.close();
+      }
+    };
     // Listen for picture being taken.
     pictureImageReader.setOnImageAvailableListener(this, backgroundHandler);
 
@@ -690,6 +711,16 @@ class Camera
       runPrecaptureSequence();
     }
   }
+
+  private int ExifToDegrees(String exifOrientation) {
+    switch(exifOrientation){
+      case "6": return 90;
+      case "3": return 180;
+      case "8": return 270;
+    }
+    return 0;
+  }
+
 
   private int calculateSampleSize(BitmapFactory.Options options, Integer reqWidth, Integer reqHeight){
     float height = options.outHeight;
@@ -785,7 +816,15 @@ class Camera
             : getDeviceOrientationManager().getPhotoOrientation(lockedOrientation));
 
     CameraCaptureSession.CaptureCallback captureCallback =
-        new CameraCaptureSession.CaptureCallback() { };
+        new CameraCaptureSession.CaptureCallback() {
+          @Override
+          public void onCaptureCompleted(
+              @NonNull CameraCaptureSession session,
+              @NonNull CaptureRequest request,
+              @NonNull TotalCaptureResult result) {
+            unlockAutoFocus();
+          }
+        };
 
     try {
       captureSession.stopRepeating();
