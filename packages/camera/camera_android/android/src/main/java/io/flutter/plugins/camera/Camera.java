@@ -335,7 +335,7 @@ class Camera
     imageStreamReader =
         ImageReader.newInstance(
             previewWidth,
-                previewHeight,
+            previewHeight,
             imageFormat,
             1);
 
@@ -350,8 +350,8 @@ class Camera
             try {
               startPreview();
               dartMessenger.sendCameraInitializedEvent(
-                  resolutionFeature.getPreviewSize().getWidth(),
-                  resolutionFeature.getPreviewSize().getHeight(),
+                  previewWidth,
+                  previewHeight,
                   cameraFeatures.getExposureLock().getValue(),
                   cameraFeatures.getAutoFocus().getValue(),
                   cameraFeatures.getExposurePoint().checkIsSupported(),
@@ -430,9 +430,7 @@ class Camera
     // Build Flutter surface to render to.
     ResolutionFeature resolutionFeature = cameraFeatures.getResolution();
     SurfaceTexture surfaceTexture = flutterTexture.surfaceTexture();
-    surfaceTexture.setDefaultBufferSize(
-        resolutionFeature.getPreviewSize().getWidth(),
-        resolutionFeature.getPreviewSize().getHeight());
+    surfaceTexture.setDefaultBufferSize(previewWidth, previewHeight);
     Surface flutterSurface = new Surface(surfaceTexture);
     previewRequestBuilder.addTarget(flutterSurface);
 
