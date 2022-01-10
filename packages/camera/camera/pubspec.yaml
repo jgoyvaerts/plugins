@@ -27,9 +27,15 @@ dependencies:
   camera_avfoundation:
     path: ../camera_avfoundation
   camera_platform_interface: 
-    path: ../camera_platform_interface
+    git: 
+        url: https://github.com/jgoyvaerts/plugins.git
+        ref: improvedCamera
+        path: packages/camera/camera_platform_interface
   camera_web: 
-    path: ../camera_web
+    git: 
+        url: https://github.com/jgoyvaerts/plugins.git
+        ref: improvedCamera
+        path: packages/camera/camera_web
   flutter:
     sdk: flutter
   flutter_plugin_android_lifecycle: ^2.0.2
