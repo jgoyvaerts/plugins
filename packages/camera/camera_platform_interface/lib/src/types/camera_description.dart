@@ -73,7 +73,7 @@ class OutputFormat {
     required this.format,
     required this.width,
     required this.height,
-  });
+  }) : aspectRatio = _calculateAspectRatio(width, height);
 
   /// The image format of this OutputFormat, for example ImageFormatGroup.jpeg
   final ImageFormatGroup format;
@@ -83,4 +83,35 @@ class OutputFormat {
 
   /// The height of this OutputFormat
   final int height;
+
+  /// The aspect ratio of this OutputFormat
+  final OuputAspectRatio aspectRatio;
+
+  static OuputAspectRatio _calculateAspectRatio(int width, int height) {
+    if (width == height) {
+      return OuputAspectRatio.one_one;
+    }
+    if ((width / 4) * 3 == height) {
+      return OuputAspectRatio.four_three;
+    }
+    if ((width / 16) * 9 == height) {
+      return OuputAspectRatio.sixteen_nine;
+    }
+    return OuputAspectRatio.unknown;
+  }
+}
+
+/// The aspect ratio of the outputformat
+enum OuputAspectRatio {
+  /// Aspect ratio 4:3
+  four_three,
+
+  /// Aspect ratio 16:9
+  sixteen_nine,
+
+  /// Aspect ratio 1:1
+  one_one,
+
+  /// All other aspect ratios
+  unknown,
 }

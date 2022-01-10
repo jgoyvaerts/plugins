@@ -13,6 +13,8 @@ export 'package:camera_platform_interface/camera_platform_interface.dart'
         ResolutionPreset,
         XFile,
         CameraImage,
+        OutputFormat,
+        OuputAspectRatio,
         Plane,
         ImageFormatGroup;
 
