@@ -704,7 +704,11 @@ class Camera
     Log.i(TAG, "isAutoFocusSupported:"+Boolean.toString(isAutoFocusSupported));
     Log.i(TAG, "autoFocusFeature:"+autoFocusFeature.getValue());
     if (isAutoFocusSupported && autoFocusFeature.getValue() == FocusMode.auto) {
-      takePictureAfterPrecapture();
+      if(cameraFeatures.getFlash().getValue() == FlashMode.always) {
+        runPrecaptureSequence();
+      } else {
+        takePictureAfterPrecapture();
+      }
     } else {
       runPrecaptureSequence();
     }
